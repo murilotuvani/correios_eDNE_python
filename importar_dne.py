@@ -5,7 +5,7 @@ import os
 import sqlalchemy
 
 def salvar(df, table_name, if_exists='replace', dtype=None):
-    sqlEngine = create_engine('mysql+pymysql://root:root@127.0.0.1:3388/cep', pool_recycle=3600)
+    sqlEngine = create_engine('mysql+pymysql://root:root@127.0.0.1:3306/cep', pool_recycle=3600)
     dbConnection    = sqlEngine.connect()
     transaction = dbConnection.begin()
     try:
@@ -107,8 +107,107 @@ def importa_localidade_variacao(file):
     print(df.head())
     salvar(df, 'dne_localidade_variacao', dtype=dtype)
 
+'''
+CAMPO	DESCRIÇÃO DO CAMPO	TIPO
+LOC_NU	chave da localidade	NUMBER(8)
+SEPARADOR	@	
+LOC_CEP_INI	CEP inicial da localidade	CHAR(8)
+SEPARADOR	@	
+LOC_CEP_FIM	CEP final da localidade	CHAR(8)
+SEPARADOR	@	
+LOC_TIPO_FAIXA	tipo de Faixa de CEP:
+T –Total do Município 
+C – Exclusiva da  Sede Urbana	CHAR(1)
+'''
+def importa_localidade_faixa(file):
+    colunas = ['loc_nu','loc_cep_ini', 'loc_cep_fim', 'loc_tipo_faixa']
+
+    dtype = {
+        'loc_nu': sqlalchemy.types.NUMERIC(8),
+        'loc_nu_ini': sqlalchemy.types.NUMERIC(8),
+        'loc_nu_fim': sqlalchemy.types.NUMERIC(8),
+        'loc_tipo_faixa': sqlalchemy.types.CHAR(1)
+    }
+
+    df = pd.read_csv(file, header=None, index_col=['loc_nu','loc_nu_ini'], names=colunas, sep='@', encoding='latin1')
+    print(df.head())
+    salvar(df, 'dne_localidade_faixa', dtype=dtype)
+
+'''
+CAMPO	DESCRIÇÃO DO CAMPO	TIPO
+BAI_NU	chave do bairro	NUMBER(8)
+SEPARADOR	@	
+UFE_SG	sigla da UF	CHAR(2)
+SEPARADOR	@	
+LOC_NU	chave da localidade	NUMBER(8)
+SEPARADOR	@	
+BAI_NO	nome do bairro	VARCHAR2(72)
+SEPARADOR	@	
+BAI_NO_ABREV	abreviatura do nome do bairro (opcional)	VARCHAR2(36)
+'''
+def importa_bairro(file):
+    colunas = ['bai_nu','ufe_sg', 'loc_nu', 'bai_no', 'bai_no_abrev']
+
+    dtype = {
+        'bai_nu': sqlalchemy.types.NUMERIC(8),
+        'ufe_sg': sqlalchemy.types.CHAR(2),
+        'loc_nu': sqlalchemy.types.NUMERIC(8),
+        'bai_no': sqlalchemy.types.VARCHAR(72),
+        'bai_no_abrev': sqlalchemy.types.VARCHAR(36)
+    }
+
+    df = pd.read_csv(file, header=None, index_col='bai_nu', names=colunas, sep='@', encoding='latin1')
+    print(df.head())
+    salvar(df, 'dne_bairro', dtype=dtype)
+
+'''
+CAMPO	DESCRIÇÃO DO CAMPO	TIPO
+BAI_NU	chave do bairro	NUMBER(8)
+SEPARADOR	@	
+VDB_NU	ordem da denominação	NUMBER(8)
+SEPARADOR	@	
+VDB_TX	Denominação	VARCHAR2(72)
+'''
+
+def importa_bairro_variacao(file):
+    colunas = ['bai_nu','vdb_nu', 'vdb_tx']
+
+    dtype = {
+        'bai_nu': sqlalchemy.types.NUMERIC(8),
+        'vdb_nu': sqlalchemy.types.NUMERIC(8),
+        'vdb_tx': sqlalchemy.types.VARCHAR(72)
+    }
+
+    df = pd.read_csv(file, header=None, index_col=['bai_nu','vdb_nu'], names=colunas, sep='@', encoding='latin1')
+    print(df.head())
+    salvar(df, 'dne_bairro_variacao', dtype=dtype)
+
+'''
+2.7.	LOG_FAIXA_BAIRRO.TXT – Faixa de CEP de Bairro
+CAMPO	DESCRIÇÃO DO CAMPO	TIPO
+BAI_NU	chave do bairro	NUMBER(8)
+SEPARADOR	@	
+FCB_CEP_INI	CEP inicial do bairro	CHAR(8)
+SEPARADOR	@	
+FCB_CEP_FIM	CEP final do bairro	CHAR(8)
+'''
+def importa_bairro_faixa(file):
+    colunas = ['bai_nu','fcb_cep_ini', 'fcb_cep_fim']
+
+    dtype = {
+        'bai_nu': sqlalchemy.types.NUMERIC(8),
+        'fcb_cep_ini': sqlalchemy.types.CHAR(8),
+        'fcb_cep_fim': sqlalchemy.types.CHAR(8)
+    }
+
+    df = pd.read_csv(file, header=None, index_col=['bai_nu','fcb_cep_ini'], names=colunas, sep='@', encoding='latin1')
+    print(df.head())
+    salvar(df, 'dne_bairro_faixa', dtype=dtype)
+
+
 folder = './tmp/correios/eDNE_Basico_25012/Delimitado'
 folder = r'C:\Users\MurilodeMoraesTuvani\tmp\correios\eDNE_Basico_25012\Delimitado'
+folder = '/Users/murilotuvani/tmp/ceps/Delimitado'
 # folder = '.'
 files = os.listdir(folder)
 
@@ -118,6 +217,14 @@ for file in files:
         importa_localidade(os.path.join(folder, file))
     elif file.casefold() == 'LOG_VAR_LOC.TXT'.casefold():
         importa_localidade_variacao(os.path.join(folder, file))
+    elif file.casefold() == 'LOG_FAIXA_LOCALIDADE.TXT'.casefold():
+        importa_localidade_faixa(os.path.join(folder, file))
+    elif file.casefold() == 'LOG_BAIRRO.TXT'.casefold():
+        importa_bairro(os.path.join(folder, file))
+    elif file.casefold() == 'LOG_VAR_BAI.TXT'.casefold():
+        importa_bairro_variacao(os.path.join(folder, file))
+    elif file.casefold() == 'LOG_FAIXA_BAIRRO.TXT'.casefold():
+        importa_bairro_faixa(os.path.join(folder, file))
     elif file.casefold().startswith('LOG_LOGRADOURO_'.casefold()):
         importa_logradouro(os.path.join(folder, file))
     else:
