@@ -3,9 +3,10 @@ import pymysql
 from sqlalchemy import create_engine
 import os
 import sqlalchemy
+from sqlalchemy.dialects.mysql import INTEGER
 
 def salvar(df, table_name, if_exists='replace', dtype=None):
-    sqlEngine = create_engine('mysql+pymysql://root:root@127.0.0.1:3306/cep', pool_recycle=3600)
+    sqlEngine = create_engine('mysql+pymysql://root:root@127.0.0.1:3308/cep', pool_recycle=3600)
     dbConnection    = sqlEngine.connect()
     transaction = dbConnection.begin()
     try:
@@ -72,11 +73,11 @@ def importa_logradouro(file):
     colunas = ['log_nu','ufe_sg','loc_nu','bai_nu_ini','bai_nu_fim','log_no','log_complemento','cep','tlo_tx','log_sta_tlo','log_no_abrev']
 
     dtype = {
-        'log_nu': sqlalchemy.types.NUMERIC(8),
+        'log_nu': INTEGER(unsigned=True),
         'ufe_sg': sqlalchemy.types.CHAR(2),
-        'loc_nu': sqlalchemy.types.NUMERIC(8),
-        'bai_nu_ini': sqlalchemy.types.NUMERIC(8),
-        'bai_nu_fim': sqlalchemy.types.NUMERIC(8),
+        'loc_nu': INTEGER(unsigned=True),
+        'bai_nu_ini': INTEGER(unsigned=True),
+        'bai_nu_fim': INTEGER(unsigned=True),
         'log_no': sqlalchemy.types.VARCHAR(100),
         'log_complemento': sqlalchemy.types.VARCHAR(100),
         'cep': sqlalchemy.types.CHAR(8),
@@ -135,13 +136,13 @@ def importa_localidade(file):
     colunas = ['loc_nu','ufe_sg', 'loc_no','cep','loc_in_sit','loc_in_tipo_loc','loc_nu_sub','loc_no_abrev','mun_nu']
 
     dtype = {
-        'loc_nu': sqlalchemy.types.NUMERIC(8),
+        'loc_nu': INTEGER(unsigned=True),
         'ufe_sg': sqlalchemy.types.CHAR(2),
         'loc_no': sqlalchemy.types.VARCHAR(72),
         'cep': sqlalchemy.types.CHAR(8),
         'loc_in_sit': sqlalchemy.types.CHAR(1),
         'loc_in_tipo_loc': sqlalchemy.types.CHAR(1),
-        'loc_nu_sub': sqlalchemy.types.NUMERIC(8),
+        'loc_nu_sub': INTEGER(unsigned=True),
         'loc_no_abrev': sqlalchemy.types.VARCHAR(50),
         'mun_nu': sqlalchemy.types.CHAR(7)
     }
@@ -164,8 +165,8 @@ def importa_localidade_variacao(file):
     colunas = ['loc_nu','val_nu', 'val_tx']
 
     dtype = {
-        'loc_nu': sqlalchemy.types.NUMERIC(8),
-        'val_nu': sqlalchemy.types.NUMERIC(8),
+        'loc_nu': INTEGER(unsigned=True),
+        'val_nu': INTEGER(unsigned=True),
         'val_tx': sqlalchemy.types.VARCHAR(72)
     }
 
@@ -188,14 +189,19 @@ C – Exclusiva da  Sede Urbana	CHAR(1)
 def importa_localidade_faixa(file):
     colunas = ['loc_nu','loc_cep_ini', 'loc_cep_fim', 'loc_tipo_faixa']
 
+    '''
+    'loc_nu': sqlalchemy.types.NUMERIC(8),
+        'loc_cep_ini': sqlalchemy.types.NUMERIC(8),
+        'loc_cep_fim': sqlalchemy.types.NUMERIC(8),
+    '''
+
     dtype = {
-        'loc_nu': sqlalchemy.types.NUMERIC(8),
-        'loc_nu_ini': sqlalchemy.types.NUMERIC(8),
-        'loc_nu_fim': sqlalchemy.types.NUMERIC(8),
+        'loc_nu': INTEGER(unsigned=True),
+        'loc_cep_ini': INTEGER(unsigned=True),
+        'loc_cep_fim': INTEGER(unsigned=True),
         'loc_tipo_faixa': sqlalchemy.types.CHAR(1)
     }
-
-    df = pd.read_csv(file, header=None, index_col=['loc_nu','loc_nu_ini'], names=colunas, sep='@', encoding='latin1')
+    df = pd.read_csv(file, header=None, index_col=['loc_nu','loc_cep_ini'], names=colunas, sep='@', encoding='latin1')
     print(df.head())
     salvar(df, 'dne_localidade_faixa', dtype=dtype)
 
@@ -215,9 +221,9 @@ def importa_bairro(file):
     colunas = ['bai_nu','ufe_sg', 'loc_nu', 'bai_no', 'bai_no_abrev']
 
     dtype = {
-        'bai_nu': sqlalchemy.types.NUMERIC(8),
+        'bai_nu': INTEGER(unsigned=True),
         'ufe_sg': sqlalchemy.types.CHAR(2),
-        'loc_nu': sqlalchemy.types.NUMERIC(8),
+        'loc_nu': INTEGER(unsigned=True),
         'bai_no': sqlalchemy.types.VARCHAR(72),
         'bai_no_abrev': sqlalchemy.types.VARCHAR(36)
     }
@@ -239,8 +245,8 @@ def importa_bairro_variacao(file):
     colunas = ['bai_nu','vdb_nu', 'vdb_tx']
 
     dtype = {
-        'bai_nu': sqlalchemy.types.NUMERIC(8),
-        'vdb_nu': sqlalchemy.types.NUMERIC(8),
+        'bai_nu': INTEGER(unsigned=True),
+        'vdb_nu': INTEGER(unsigned=True),
         'vdb_tx': sqlalchemy.types.VARCHAR(72)
     }
 
@@ -261,7 +267,7 @@ def importa_bairro_faixa(file):
     colunas = ['bai_nu','fcb_cep_ini', 'fcb_cep_fim']
 
     dtype = {
-        'bai_nu': sqlalchemy.types.NUMERIC(8),
+        'bai_nu': INTEGER(unsigned=True),
         'fcb_cep_ini': sqlalchemy.types.CHAR(8),
         'fcb_cep_fim': sqlalchemy.types.CHAR(8)
     }
@@ -290,9 +296,9 @@ def importa_caixa_postal_comunitaria(file):
     colunas = ['cpc_nu','ufe_sg', 'loc_nu', 'cpc_no', 'cpc_endereco', 'cep']
 
     dtype = {
-        'cpc_nu': sqlalchemy.types.NUMERIC(8),
+        'cpc_nu': INTEGER(unsigned=True),
         'ufe_sg': sqlalchemy.types.CHAR(2),
-        'loc_nu': sqlalchemy.types.NUMERIC(8),
+        'loc_nu': INTEGER(unsigned=True),
         'cpc_no': sqlalchemy.types.VARCHAR(72),
         'cpc_endereco': sqlalchemy.types.VARCHAR(100),
         'cep': sqlalchemy.types.CHAR(8)
@@ -315,7 +321,7 @@ def importa_caixa_postal_comunitaria_faixa(file):
     colunas = ['cpc_nu','cpc_inicial', 'cpc_final']
 
     dtype = {
-        'cpc_nu': sqlalchemy.types.NUMERIC(8),
+        'cpc_nu': INTEGER(unsigned=True),
         'cpc_inicial': sqlalchemy.types.VARCHAR(6),
         'cpc_final': sqlalchemy.types.VARCHAR(6)
     }
@@ -344,7 +350,7 @@ def importa_seccionamento(file):
     colunas = ['log_nu','sec_nu_ini', 'sec_nu_fim', 'sec_in_lado']
 
     dtype = {
-        'log_nu': sqlalchemy.types.NUMERIC(8),
+        'log_nu': INTEGER(unsigned=True),
         'sec_nu_ini': sqlalchemy.types.VARCHAR(10),
         'sec_nu_fim': sqlalchemy.types.VARCHAR(10),
         'sec_in_lado': sqlalchemy.types.CHAR(1)
@@ -381,11 +387,11 @@ def importa_grande_usuario(file):
     colunas = ['gru_nu','ufe_sg', 'loc_nu', 'bai_nu', 'log_nu', 'gru_no', 'gru_endereco', 'cep', 'gru_no_abrev']
 
     dtype = {
-        'gru_nu': sqlalchemy.types.NUMERIC(8),
+        'gru_nu': INTEGER(unsigned=True),
         'ufe_sg': sqlalchemy.types.CHAR(2),
-        'loc_nu': sqlalchemy.types.NUMERIC(8),
-        'bai_nu': sqlalchemy.types.NUMERIC(8),
-        'log_nu': sqlalchemy.types.NUMERIC(8),
+        'loc_nu': INTEGER(unsigned=True),
+        'bai_nu': INTEGER(unsigned=True),
+        'log_nu': INTEGER(unsigned=True),
         'gru_no': sqlalchemy.types.VARCHAR(72),
         'gru_endereco': sqlalchemy.types.VARCHAR(100),
         'cep': sqlalchemy.types.CHAR(8),
@@ -425,11 +431,11 @@ def importa_unidade_operacional(file):
     colunas = ['uop_nu','ufe_sg', 'loc_nu', 'bai_nu', 'log_nu', 'uop_no', 'uop_endereco', 'cep', 'uop_in_cp', 'uop_no_abrev']
 
     dtype = {
-        'uop_nu': sqlalchemy.types.NUMERIC(8),
+        'uop_nu': INTEGER(unsigned=True),
         'ufe_sg': sqlalchemy.types.CHAR(2),
-        'loc_nu': sqlalchemy.types.NUMERIC(8),
-        'bai_nu': sqlalchemy.types.NUMERIC(8),
-        'log_nu': sqlalchemy.types.NUMERIC(8),
+        'loc_nu': INTEGER(unsigned=True),
+        'bai_nu': INTEGER(unsigned=True),
+        'log_nu': INTEGER(unsigned=True),
         'uop_no': sqlalchemy.types.VARCHAR(100),
         'uop_endereco': sqlalchemy.types.VARCHAR(100),
         'cep': sqlalchemy.types.CHAR(8),
@@ -454,9 +460,9 @@ def importa_unidade_operacional_faixa(file):
     colunas = ['uop_nu','fnc_inicial', 'fnc_final']
 
     dtype = {
-        'uop_nu': sqlalchemy.types.NUMERIC(8),
-        'fnc_inicial': sqlalchemy.types.NUMERIC(8),
-        'fnc_final': sqlalchemy.types.NUMERIC(8)
+        'uop_nu': INTEGER(unsigned=True),
+        'fnc_inicial': INTEGER(unsigned=True),
+        'fnc_final': INTEGER(unsigned=True)
     }
 
     df = pd.read_csv(file, header=None, index_col=['uop_nu','fnc_inicial'], names=colunas, sep='@', encoding='latin1')
@@ -497,7 +503,7 @@ def importa_pais(file):
 
 folder = './tmp/correios/eDNE_Basico_25012/Delimitado'
 folder = r'C:\Users\MurilodeMoraesTuvani\tmp\correios\eDNE_Basico_25012\Delimitado'
-folder = '/Users/murilotuvani/tmp/ceps/Delimitado'
+#folder = '/Users/murilotuvani/tmp/ceps/Delimitado'
 # folder = '.'
 files = os.listdir(folder)
 
