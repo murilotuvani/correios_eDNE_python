@@ -47,19 +47,50 @@ select a.loc_nu, a.loc_no, a.loc_in_sit, a.loc_in_tipo_loc tipo
   where reb.Rotas is not null
     AND c.fcb_cep_ini is not null;
   
-select if(loc_nu=9260,12,0), Rotas, Rotas
+select * from cep.dne_localidade where loc_nu=9023;
+select a.*
+  from cep.dne_localidade a
+ where a.loc_no in ('BOITUVA','CABREUVA','CERQUILHO','INDAIATUBA','ITU','PORTO FELIZ','PIEDADE','SALTO','SOROCABA','TATUI')
+   and a.ufe_sg='SP'
+   and a.loc_in_tipo_loc='M'
+ order by a.loc_no;
+ 
+select case when loc_nu=8977 then 10
+            when loc_nu=9004 then 8
+            when loc_nu=9058 then 13
+            when loc_nu=9216 then 5
+            when loc_nu=9260 then 12
+            when loc_nu=9483 then 11
+            when loc_nu=9518 then 6
+            when loc_nu=9587 then 2
+            when loc_nu=9696 then 3
+            when loc_nu=9725 then 9
+            else 0
+	   end loja_id
+     , Rotas, Rotas
   from cep.rotas_externas_bairros reb
  where reb.Rotas is not null
 group by loc_nu, Rotas
 order by loc_nu, Rotas;
 
+select * from autogeral.expe_rota_exte;
 insert into autogeral.expe_rota_exte (loja_id, nume, nome, modo, cria_em, cria_por, alte_em, alte_por) 
-(select if(loc_nu=9260,12,0), Rotas, Rotas, 'IMEDIATA', now(), 'gabriel.ramos', now(), 'gabriel.ramos'
+(select case when loc_nu=8977 then 10
+            when loc_nu=9004 then 8
+            when loc_nu=9058 then 13
+            when loc_nu=9216 then 5
+            when loc_nu=9260 then 12
+            when loc_nu=9483 then 11
+            when loc_nu=9518 then 6
+            when loc_nu=9587 then 2
+            when loc_nu=9696 then 3
+            when loc_nu=9725 then 9
+            else 0
+	   end loja_id, Rotas, Rotas, 'IMEDIATA', now(), 'gabriel.ramos', now(), 'gabriel.ramos'
   from cep.rotas_externas_bairros reb
  where reb.Rotas is not null
 group by loc_nu, Rotas
 order by loc_nu, Rotas);
-
 
 select re.EXPE_ROTA_EXTE_ID
       , concat_ws(' - Bairro N. ', b.bai_no, b.bai_nu) 
@@ -86,6 +117,4 @@ select re.EXPE_ROTA_EXTE_ID
                                        join cep.dne_localidade a on b.loc_nu=a.loc_nu
                                        join autogeral.expe_rota_exte re on reb.Rotas=re.nume
   where reb.Rotas is not null
-    AND c.fcb_cep_ini is not null
-    and a.loc_nu=9260
-    and re.LOJA_ID=12;
+    AND c.fcb_cep_ini is not null;
