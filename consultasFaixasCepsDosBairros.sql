@@ -1,3 +1,4 @@
+select * from autogeral.bairros;
 use cep;
 select * 
   from dne_localidade
@@ -36,15 +37,21 @@ select a.loc_nu, a.loc_no, a.loc_in_sit, a.loc_in_tipo_loc tipo
  
  select * from cep.rotas_externas_bairros;
  
+  -- Definição das faixas de ceps a partir da planilha
+ select reb.Rotas
+      , b.bai_nu, b.bai_no, b.bai_no_abrev
+   from autogeral.bairros reb join ceps.dne_bairro b on reb.bai_nu=b.bai_nu and reb.loc_nu=b.loc_nu
+  where reb.Rotas is not null;
+ 
  -- Definição das faixas de ceps a partir da planilha
  select reb.Rotas
       , a.loc_no
       , b.bai_nu, b.bai_no, b.bai_no_abrev
       , c.fcb_cep_ini
       , c.fcb_cep_fim
-   from autogeral.bairros reb join cep.dne_bairro b on reb.bai_nu=b.bai_nu and reb.loc_nu=b.loc_nu
-							  join cep.dne_bairro_faixa c on c.bai_nu=b.bai_nu
-                              join cep.dne_localidade a on b.loc_nu=a.loc_nu
+   from autogeral.bairros reb join ceps.dne_bairro b on reb.bai_nu=b.bai_nu and reb.loc_nu=b.loc_nu
+							  join ceps.dne_bairro_faixa c on c.bai_nu=b.bai_nu
+                              join ceps.dne_localidade a on b.loc_nu=a.loc_nu
   where reb.Rotas is not null
     AND c.fcb_cep_ini is not null;
   
@@ -69,7 +76,7 @@ select case when loc_nu=8977 then 10
             else 0
 	   end loja_id
      , Rotas, Rotas
-  from cep.rotas_externas_bairros reb
+  from autogeral.bairros reb
  where reb.Rotas is not null
 group by loc_nu, Rotas
 order by loc_nu, Rotas;
