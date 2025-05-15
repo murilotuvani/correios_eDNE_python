@@ -1,4 +1,5 @@
 select * from autogeral.bairros;
+select * from autogeral.bairros where Rotas is not null;
 use cep;
 select * 
   from dne_localidade
@@ -38,9 +39,10 @@ select a.loc_nu, a.loc_no, a.loc_in_sit, a.loc_in_tipo_loc tipo
  select * from cep.rotas_externas_bairros;
  
   -- Definição das faixas de ceps a partir da planilha
+  -- Tem que bater 1445
  select reb.Rotas
       , b.bai_nu, b.bai_no, b.bai_no_abrev
-   from autogeral.bairros reb join ceps.dne_bairro b on reb.bai_nu=b.bai_nu and reb.loc_nu=b.loc_nu
+   from autogeral.bairros reb join cep.dne_bairro b on reb.bai_nu=b.bai_nu and reb.loc_nu=b.loc_nu
   where reb.Rotas is not null;
  
  -- Definição das faixas de ceps a partir da planilha
@@ -49,9 +51,9 @@ select a.loc_nu, a.loc_no, a.loc_in_sit, a.loc_in_tipo_loc tipo
       , b.bai_nu, b.bai_no, b.bai_no_abrev
       , c.fcb_cep_ini
       , c.fcb_cep_fim
-   from autogeral.bairros reb join ceps.dne_bairro b on reb.bai_nu=b.bai_nu and reb.loc_nu=b.loc_nu
-							  join ceps.dne_bairro_faixa c on c.bai_nu=b.bai_nu
-                              join ceps.dne_localidade a on b.loc_nu=a.loc_nu
+   from autogeral.bairros reb join cep.dne_bairro b on reb.bai_nu=b.bai_nu and reb.loc_nu=b.loc_nu
+							  join cep.dne_bairro_faixa c on c.bai_nu=b.bai_nu
+                              join cep.dne_localidade a on b.loc_nu=a.loc_nu
   where reb.Rotas is not null
     AND c.fcb_cep_ini is not null;
   
@@ -63,7 +65,10 @@ select a.*
    and a.loc_in_tipo_loc='M'
  order by a.loc_no;
  
-select case when loc_nu=8977 then 10
+ -- Averiguar se de fato vai ter rota (0) zero
+ select case when loc_nu=9696 and Rotas like '%SC' then 3
+            when loc_nu=9696 and Rotas like '%E' then 7
+            when loc_nu=8977 then 10
             when loc_nu=9004 then 8
             when loc_nu=9058 then 13
             when loc_nu=9216 then 5
@@ -71,15 +76,39 @@ select case when loc_nu=8977 then 10
             when loc_nu=9483 then 11
             when loc_nu=9518 then 6
             when loc_nu=9587 then 2
-            when loc_nu=9696 then 3
             when loc_nu=9725 then 9
             else 0
 	   end loja_id
-     , Rotas, Rotas
+     , REGEXP_REPLACE(Rotas, '[^0-9]', '') rota_nume
+     , Rotas rota_nome
+     , bai_no
+     , Rotas
   from autogeral.bairros reb
  where reb.Rotas is not null
-group by loc_nu, Rotas
-order by loc_nu, Rotas;
+   AND reb.loc_nu=9518
+order by rota_nume;
+ 
+-- Número da localidade no banco de dados dos correios é a clidade
+-- Para nos cada cidade é atendida por uma loja
+select case when loc_nu=9696 and Rotas like '%SC' then 3
+            when loc_nu=9696 and Rotas like '%E' then 7
+            when loc_nu=8977 then 10
+            when loc_nu=9004 then 8
+            when loc_nu=9058 then 13
+            when loc_nu=9216 then 5
+            when loc_nu=9260 then 12
+            when loc_nu=9483 then 11
+            when loc_nu=9518 then 6
+            when loc_nu=9587 then 2
+            when loc_nu=9725 then 9
+            else 0
+	   end loja_id
+     , REGEXP_REPLACE(Rotas, '[^0-9]', '') rota_nume
+     , Rotas rota_nome
+  from autogeral.bairros reb
+ where reb.Rotas is not null
+group by loja_id, loc_nu, Rotas
+order by loja_id, loc_nu, Rotas;
 
 select * from autogeral.expe_rota_exte;
 
@@ -101,7 +130,14 @@ insert into autogeral.expe_rota_exte (loja_id, nume, nome, modo, cria_em, cria_p
             when loc_nu=9696 then 3
             when loc_nu=9725 then 9
             else 0
-	   end loja_id, Rotas, Rotas, 'IMEDIATA', now(), 'gabriel.ramos', now(), 'gabriel.ramos'
+	   end loja_id, 
+       REGEXP_REPLACE(Rotas, '[^0-9]', ''),
+       Rotas,
+       'IMEDIATA',
+       now(),
+       'gabriel.ramos',
+       now(),
+       'gabriel.ramos'
   from autogeral.bairros reb
  where reb.Rotas is not null
 group by loc_nu, Rotas
