@@ -219,4 +219,40 @@ select re.EXPE_ROTA_EXTE_ID
   where reb.Rotas is not null
     AND c.fcb_cep_ini is not null;
     
-    select * from autogeral.expe_rota_exte_faix_cep;
+ -- confirmar se há sobreposições por cep_inicial e cep_final:
+SELECT 
+    a.EXPE_ROTA_EXTE_FAIX_CEP_ID AS faixa_a_id,
+    b.EXPE_ROTA_EXTE_FAIX_CEP_ID AS faixa_b_id,
+    a.CEP_INIC AS faixa_a_inicio,
+    a.CEP_FINA AS faixa_a_fim,
+    b.CEP_INIC AS faixa_b_inicio,
+    b.CEP_FINA AS faixa_b_fim
+FROM 
+    autogeral.expe_rota_exte_faix_cep a
+JOIN 
+    autogeral.expe_rota_exte_faix_cep b 
+    ON a.EXPE_ROTA_EXTE_FAIX_CEP_ID <> b.EXPE_ROTA_EXTE_FAIX_CEP_ID
+   AND a.EXPE_ROTA_EXTE_ID = b.EXPE_ROTA_EXTE_ID
+   AND a.CEP_INIC <= b.CEP_FINA
+   AND a.CEP_FINA >= b.CEP_INIC
+   AND NOT (
+        a.CEP_INIC = b.CEP_INIC AND 
+        a.CEP_FINA = b.CEP_FINA
+   )
+ORDER BY faixa_a_id, faixa_b_id;
+
+-- Confirmar isso com uma contagem de sobreposições:
+SELECT COUNT(*) AS qtd_sobreposicoes
+FROM 
+    autogeral.expe_rota_exte_faix_cep a
+JOIN 
+    autogeral.expe_rota_exte_faix_cep b 
+    ON a.EXPE_ROTA_EXTE_FAIX_CEP_ID <> b.EXPE_ROTA_EXTE_FAIX_CEP_ID
+   AND a.CEP_INIC <= b.CEP_FINA
+   AND a.CEP_FINA >= b.CEP_INIC
+   AND NOT (
+        a.CEP_INIC = b.CEP_INIC AND 
+        a.CEP_FINA = b.CEP_FINA
+   );
+
+
