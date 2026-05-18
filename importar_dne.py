@@ -6,7 +6,7 @@ import sqlalchemy
 from sqlalchemy.dialects.mysql import INTEGER
 
 def salvar(df, table_name, if_exists='replace', dtype=None):
-    sqlEngine = create_engine('mysql+pymysql://root:root@127.0.0.1:3308/cep', pool_recycle=3600)
+    sqlEngine = create_engine('mysql+pymysql://root:root@10.50.1.252:3306/ceps', pool_recycle=3600)
     dbConnection    = sqlEngine.connect()
     transaction = dbConnection.begin()
     try:
