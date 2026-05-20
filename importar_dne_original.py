@@ -6,7 +6,7 @@ import re
 import sqlalchemy
 
 #função importada de 'importar_dne.py'
-def salvar(df, table_name, if_exists='replace', dtype=None):
+def salvar(df, table_name, if_exists='append', dtype=None):
     sqlEngine = create_engine('mysql+pymysql://root:root@10.50.1.128:3306/ceps', pool_recycle=3600)
     dbConnection    = sqlEngine.connect()
     transaction = dbConnection.begin()
@@ -22,25 +22,27 @@ def salvar(df, table_name, if_exists='replace', dtype=None):
     finally:
         dbConnection.close()
 
-#função paraimportar as tabelas (deixando mais prático)
+#função para importar pro MySQL (mais prático)
 #coloca o caminho do(s) arquivo(s)
 arquivos_x= []
 #nome das colunas
 colunas_x= []
 #o tipo das colunas (VARCHAR, INTEGER(), CHAR etc)
 dtype_x= {} #precisa ter a coluna que mostra qual a atualização do arquivo (vai ser 'atualizacao': sqlalchemy.INTEGER()
-#função para importar pro MySQL
-def importar_dne (arquivos, colunas, tabela, dtype, versao):
+versoes_x= [] #número da atualização do arquivo
+def importar_dne (arquivos, colunas, tabela, dtype, versoes):
     #lista que vai armazenar os dfs
     dfs= []
     #percorrer cada arquivo na lista
-    for arquivo in arquivos:
+    for arquivo, versao in zip (arquivos, versoes):
         df= pd.read_csv(arquivo,
                 sep= '@',
                 names= colunas,
                 header= None,
                 encoding= 'ISO-8859-1'
                 )
+        #cria coluna chamada 'atualizacao'; todas as linhas vão ter o número da atualização
+        df['atualizacao']= versao
         #adiciona df na lista
         dfs.append(df)
     #pra ver quantos dfs existem
@@ -53,8 +55,6 @@ def importar_dne (arquivos, colunas, tabela, dtype, versao):
                     #reorganiza os indices
                     ignore_index= True
                 )
-    #cria coluna chamada 'atualizacao'; todas as linhas vão ter o número da atualização
-    df_final['atualizacao']= versao
     #chama função salvar()
     salvar(df_final, tabela, dtype= dtype)
 
@@ -68,7 +68,8 @@ dtype_faixauf= {
         'ufe_cep_fim': sqlalchemy.types.CHAR(8),
         'atualizacao': sqlalchemy.INTEGER()
         }
-importar_dne(arquivos_faixauf, colunas_faixauf, 'dne_faixa_uf', dtype_faixauf, 25012)
+versoes_faixauf= [25012]
+importar_dne(arquivos_faixauf, colunas_faixauf, 'dne_faixa_uf', dtype_faixauf, versoes_faixauf)
 
 #LOCALIDADE
 arquivos_localidade = ["C:\\projetos\\Delimitado\\LOG_LOCALIDADE.TXT"]
@@ -85,7 +86,8 @@ dtype_localidade= {
         'mun_nu': sqlalchemy.types.CHAR(7),
         'atualizacao': sqlalchemy.INTEGER()
 }
-importar_dne(arquivos_localidade, colunas_localidade, 'dne_localidade', dtype_localidade, 25012)
+versoes_localidade= [25012]
+importar_dne(arquivos_localidade, colunas_localidade, 'dne_localidade', dtype_localidade, versoes_localidade)
 
 #OUTRAS DENOMINAÇÕES DA LOCALIDADE
 arquivos_varloc = ["C:\\projetos\\Delimitado\\LOG_VAR_LOC.TXT"]
@@ -96,7 +98,8 @@ dtype_varloc= {
         'val_tx': sqlalchemy.types.VARCHAR(72),
         'atualizacao': sqlalchemy.INTEGER()
 }
-importar_dne(arquivos_varloc, colunas_varloc, 'dne_var_loc', dtype_varloc, 25012)
+versoes_varloc= [25012]
+importar_dne(arquivos_varloc, colunas_varloc, 'dne_var_loc', dtype_varloc, versoes_varloc)
 
 #FAIXA DE CEP DAS LOCALIDADES CODIFICADAS
 arquivos_faixalocalidade = ["C:\\projetos\\Delimitado\\LOG_FAIXA_LOCALIDADE.TXT"]
@@ -108,7 +111,8 @@ dtype_faixalocalidade= {
         'loc_tipo_faixa': sqlalchemy.types.CHAR(1),
         'atualizacao': sqlalchemy.INTEGER()
 }
-importar_dne(arquivos_faixalocalidade, colunas_faixalocalidade, 'dne_faixa_localidade', dtype_faixalocalidade, 25012)
+versoes_faixalocalidade= [25012]
+importar_dne(arquivos_faixalocalidade, colunas_faixalocalidade, 'dne_faixa_localidade', dtype_faixalocalidade, versoes_faixalocalidade)
 
 #BAIRRO
 arquivos_bairro = ["C:\\projetos\\Delimitado\\LOG_BAIRRO.TXT"]
@@ -121,7 +125,8 @@ dtype_bairro= {
         'bai_no_abrev': sqlalchemy.types.VARCHAR(36),
         'atualizacao': sqlalchemy.INTEGER()
 }
-importar_dne(arquivos_bairro, colunas_bairro, 'dne_bairro', dtype_bairro, 25012)
+versoes_bairro= [25012]
+importar_dne(arquivos_bairro, colunas_bairro, 'dne_bairro', dtype_bairro, versoes_bairro)
 
 #OUTRAS DENOMINAÇÕES DE BAIRRO
 arquivos_varbairro = ["C:\\projetos\\Delimitado\\LOG_VAR_BAI.TXT"]
@@ -132,7 +137,8 @@ dtype_varbairro= {
         'vdb_tx': sqlalchemy.types.VARCHAR(72),
         'atualizacao': sqlalchemy.INTEGER()
 }
-importar_dne(arquivos_varbairro, colunas_varbairro, 'dne_var_bairro', dtype_varbairro, 25012)
+versoes_varbairro= [25012]
+importar_dne(arquivos_varbairro, colunas_varbairro, 'dne_var_bairro', dtype_varbairro, versoes_varbairro)
 
 #FAIXA CEP DE BAIRRO
 arquivos_faixabairro = ["C:\\projetos\\Delimitado\\LOG_FAIXA_BAIRRO.TXT"]
@@ -143,7 +149,8 @@ dtype_faixabairro= {
         'fcb_cep_fim': sqlalchemy.types.CHAR(8),
         'atualizacao': sqlalchemy.INTEGER()
 }
-importar_dne(arquivos_faixabairro, colunas_faixabairro, 'dne_faixa_bairro', dtype_faixabairro, 25012)
+versoes_faixabairro= [25012]
+importar_dne(arquivos_faixabairro, colunas_faixabairro, 'dne_faixa_bairro', dtype_faixabairro, versoes_faixabairro)
 
 #CAIXA POSTAL COMUNITÁRIA
 arquivos_cpc = ["C:\\projetos\\Delimitado\\LOG_CPC.TXT"]
@@ -157,7 +164,8 @@ dtype_cpc= {
         'cep': sqlalchemy.types.CHAR(8),
         'atualizacao': sqlalchemy.INTEGER()
 }
-importar_dne(arquivos_cpc, colunas_cpc, 'dne_cpc', dtype_cpc, 25012)
+versoes_cpc= [25012]
+importar_dne(arquivos_cpc, colunas_cpc, 'dne_cpc', dtype_cpc, versoes_cpc)
 
 #FAIXA DE CAIXA POSTAL COMUNITÁRIA
 arquivos_faixacpc = ["C:\\projetos\\Delimitado\\LOG_FAIXA_CPC.TXT"]
@@ -168,7 +176,8 @@ dtype_faixacpc= {
         'cpc_final': sqlalchemy.types.CHAR(6),
         'atualizacao': sqlalchemy.INTEGER()
 }
-importar_dne(arquivos_faixacpc, colunas_faixacpc, 'dne_faixa_cpc', dtype_faixacpc, 25012)
+versoes_faixacpc= [25012]
+importar_dne(arquivos_faixacpc, colunas_faixacpc, 'dne_faixa_cpc', dtype_faixacpc, versoes_faixacpc)
 
 #LOGRADOUROS
 arquivos_logradouros = ["C:\\projetos\\Delimitado\\LOG_LOGRADOURO_AC.TXT",
@@ -213,7 +222,8 @@ dtype_logradouros= {
         'log_no_abrev': sqlalchemy.types.VARCHAR(36),
         'atualizacao': sqlalchemy.INTEGER()
 }
-importar_dne(arquivos_logradouros, colunas_logradouros, 'dne_logradouro', dtype_logradouros, 25012)
+versoes_logradouros= [25012]
+importar_dne(arquivos_logradouros, colunas_logradouros, 'dne_logradouro', dtype_logradouros, versoes_logradouros)
 
 #OUTRAS DENOMINAÇÕES DO LOGRADOURO
 arquivos_varlog = ["C:\\projetos\\Delimitado\\LOG_VAR_LOG.TXT"]
@@ -225,7 +235,8 @@ dtype_varlog= {
         'vlo_tx': sqlalchemy.types.VARCHAR(150),
         'atualizacao': sqlalchemy.INTEGER()
 }
-importar_dne(arquivos_varlog, colunas_varlog, 'dne_var_log', dtype_varlog, 25012)
+versoes_varlog= [25012]
+importar_dne(arquivos_varlog, colunas_varlog, 'dne_var_log', dtype_varlog, versoes_varlog)
 
 #FAIXA NUMÉRICA DO SECCIONAMENTO
 arquivos_numsec = ["C:\\projetos\\Delimitado\\LOG_NUM_SEC.TXT"]
@@ -237,7 +248,8 @@ dtype_numsec= {
         'sec_in_lado': sqlalchemy.types.CHAR(1),
         'atualizacao': sqlalchemy.INTEGER()
 }
-importar_dne(arquivos_numsec, colunas_numsec, 'dne_num_sec', dtype_numsec, 25012)
+versoes_numsec= [25012]
+importar_dne(arquivos_numsec, colunas_numsec, 'dne_num_sec', dtype_numsec, versoes_numsec)
 
 #GRANDE USUÁRIO
 arquivos_gu = ["C:\\projetos\\Delimitado\\LOG_GRANDE_USUARIO.TXT"]
@@ -254,7 +266,8 @@ dtype_gu= {
         'gru_no_abrev': sqlalchemy.types.VARCHAR(36),
         'atualizacao': sqlalchemy.INTEGER()
 }
-importar_dne(arquivos_gu, colunas_gu, 'dne_grande_usuario', dtype_gu, 25012)
+versoes_gu= [25012]
+importar_dne(arquivos_gu, colunas_gu, 'dne_grande_usuario', dtype_gu, versoes_gu)
 
 #UNIDADE OPERACIONAL DOS CORREIOS
 arquivos_uop = ["C:\\projetos\\Delimitado\\LOG_UNID_OPER.TXT"]
@@ -272,7 +285,8 @@ dtype_uop= {
         'uop_no_abrev': sqlalchemy.types.VARCHAR(36),
         'atualizacao': sqlalchemy.INTEGER()
 }
-importar_dne(arquivos_uop, colunas_uop, 'dne_unidade_operacional', dtype_uop, 25012)
+versoes_uop= [25012]
+importar_dne(arquivos_uop, colunas_uop, 'dne_unidade_operacional', dtype_uop, versoes_uop)
 
 #FAIXA DE CAIXA POSTAL
 arquivos_faixauop = ["C:\\projetos\\Delimitado\\LOG_FAIXA_UOP.TXT"]
@@ -283,7 +297,8 @@ dtype_faixauop= {
         'fnc_final': sqlalchemy.INTEGER(),
         'atualizacao': sqlalchemy.INTEGER()
 }
-importar_dne(arquivos_faixauop, colunas_faixauop, 'dne_faixa_uop', dtype_faixauop, 25012)
+versoes_faixauop= [25012]
+importar_dne(arquivos_faixauop, colunas_faixauop, 'dne_faixa_uop', dtype_faixauop, versoes_faixauop)
 
 #RELAÇÃO DOS NOMES DOS PAÍSES
 arquivos_ectpaises = ["C:\\projetos\\Delimitado\\ECT_PAIS.TXT"]
@@ -297,4 +312,5 @@ dtype_ectpaises= {
         'pai_abreviatura': sqlalchemy.types.CHAR(36),
         'atualizacao': sqlalchemy.INTEGER()
 }
-importar_dne(arquivos_ectpaises, colunas_ectpaises, 'dne_ect_pais', dtype_ectpaises, 25012)
+versoes_ectpaises= [25012]
+importar_dne(arquivos_ectpaises, colunas_ectpaises, 'dne_ect_pais', dtype_ectpaises, versoes_ectpaises)
