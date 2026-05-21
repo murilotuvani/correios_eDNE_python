@@ -301,7 +301,7 @@ versoes_faixauopd= [25012, 25021, 25022, 25031, 25032, 25041, 25042, 25051, 2505
 importar_dne(arquivos_faixauopd, colunas_faixauopd, 'dne_delta_faixa_uop', dtype_faixauopd, versoes_faixauopd)
 
 #LOCALIDADE
-arquivos_faixalocd= ['c:\\projetos\\eDNE\\25031\\Delimitado\\DELTA_LOG_LOCALIDADE.TXT', 
+arquivos_locd= ['c:\\projetos\\eDNE\\25031\\Delimitado\\DELTA_LOG_LOCALIDADE.TXT', 
                      'c:\\projetos\\eDNE\\25032\\Delimitado\\DELTA_LOG_LOCALIDADE.TXT', 
                      'c:\\projetos\\eDNE\\25041\\Delimitado\\DELTA_LOG_LOCALIDADE.TXT', 
                      'c:\\projetos\\eDNE\\25042\\Delimitado\\DELTA_LOG_LOCALIDADE.TXT', 
@@ -330,8 +330,8 @@ arquivos_faixalocd= ['c:\\projetos\\eDNE\\25031\\Delimitado\\DELTA_LOG_LOCALIDAD
                      'c:\\projetos\\eDNE\\26022\\Delimitado\\DELTA_LOG_LOCALIDADE.TXT', 
                      'c:\\projetos\\eDNE\\26031\\Delimitado\\DELTA_LOG_LOCALIDADE.TXT'
                      ]
-colunas_faixalocd= ['loc_nu', 'ufe_sg', 'loc_no', 'cep', 'loc_in_sit', 'loc_in_tipo_loc', 'loc_nu_sub', 'loc_no_abrev', 'mun_nu', 'loc_operacao', 'cep_ant']
-dtype_faixalocd= {'loc_nu': sqlalchemy.INTEGER(),        
+colunas_locd= ['loc_nu', 'ufe_sg', 'loc_no', 'cep', 'loc_in_sit', 'loc_in_tipo_loc', 'loc_nu_sub', 'loc_no_abrev', 'mun_nu', 'loc_operacao', 'cep_ant']
+dtype_locd= {'loc_nu': sqlalchemy.INTEGER(),        
                 'ufe_sg': sqlalchemy.types.CHAR(2),
                 'loc_no': sqlalchemy.types.VARCHAR(72),
                 'cep': sqlalchemy.types.CHAR(8),
@@ -343,8 +343,8 @@ dtype_faixalocd= {'loc_nu': sqlalchemy.INTEGER(),
                 'loc_operacao': sqlalchemy.types.CHAR(3),
                 'cep_ant': sqlalchemy.types.CHAR(8)
      }
-versoes_faixalocd= [25031, 25032, 25041, 25042, 25051, 25052, 25061, 25062, 25071, 25072, 25081, 25082, 25012, 25021, 25022, 25091, 25092, 25101, 25102, 25111, 25112, 25121, 25122, 26011, 26012, 26021, 26022, 26031]
-importar_dne(arquivos_faixalocd, colunas_faixalocd, 'dne_delta_localidade', dtype_faixalocd, versoes_faixalocd)
+versoes_locd= [25031, 25032, 25041, 25042, 25051, 25052, 25061, 25062, 25071, 25072, 25081, 25082, 25012, 25021, 25022, 25091, 25092, 25101, 25102, 25111, 25112, 25121, 25122, 26011, 26012, 26021, 26022, 26031]
+importar_dne(arquivos_locd, colunas_locd, 'dne_delta_localidade', dtype_locd, versoes_locd)
 
 #LOGRADOURO
 arquivos_logradourod= ['c:\\projetos\\eDNE\\25012\\Delimitado\\DELTA_LOG_LOGRADOURO.TXT', 
@@ -432,3 +432,50 @@ dtype_numsecd= {'log_nu': sqlalchemy.INTEGER(),
              }
 versoes_numsecd= [25082, 25081, 25072, 25071, 25062, 25061, 25052, 25051, 25042, 25041, 25032, 25031, 25022, 25021, 25012, 26031, 26022, 26021, 26012, 26011, 25122, 25121, 25112, 25111, 25102, 25101, 25092, 25091]
 importar_dne(arquivos_numsecd, colunas_numsecd, 'dne_delta_num_sec', dtype_numsecd, versoes_numsecd)
+
+#GRANDES USUÁRIOS
+arquivos_gud = ['c:\\projetos\\eDNE\\25012\\Delimitado\\DELTA_LOG_GRANDE_USUARIO.TXT', 
+               'c:\\projetos\\eDNE\\25021\\Delimitado\\DELTA_LOG_GRANDE_USUARIO.TXT', 
+               'c:\\projetos\\eDNE\\25022\\Delimitado\\DELTA_LOG_GRANDE_USUARIO.TXT', 
+               'c:\\projetos\\eDNE\\25031\\Delimitado\\DELTA_LOG_GRANDE_USUARIO.TXT', 
+               'c:\\projetos\\eDNE\\25032\\Delimitado\\DELTA_LOG_GRANDE_USUARIO.TXT', 
+               'c:\\projetos\\eDNE\\25041\\Delimitado\\DELTA_LOG_GRANDE_USUARIO.TXT', 
+               'c:\\projetos\\eDNE\\25042\\Delimitado\\DELTA_LOG_GRANDE_USUARIO.TXT', 
+               'c:\\projetos\\eDNE\\25051\\Delimitado\\DELTA_LOG_GRANDE_USUARIO.TXT', 
+               'c:\\projetos\\eDNE\\25052\\Delimitado\\DELTA_LOG_GRANDE_USUARIO.TXT', 
+               'c:\\projetos\\eDNE\\25061\\Delimitado\\DELTA_LOG_GRANDE_USUARIO.TXT', 
+               'c:\\projetos\\eDNE\\25062\\Delimitado\\DELTA_LOG_GRANDE_USUARIO.TXT', 
+               'c:\\projetos\\eDNE\\25071\\Delimitado\\DELTA_LOG_GRANDE_USUARIO.TXT', 
+               'c:\\projetos\\eDNE\\25072\\Delimitado\\DELTA_LOG_GRANDE_USUARIO.TXT', 
+               'c:\\projetos\\eDNE\\25081\\Delimitado\\DELTA_LOG_GRANDE_USUARIO.TXT', 
+               'c:\\projetos\\eDNE\\25082\\Delimitado\\DELTA_LOG_GRANDE_USUARIO.TXT',
+               'c:\\projetos\\eDNE\\25091\\Delimitado\\DELTA_LOG_GRANDE_USUARIO.TXT', 
+               'c:\\projetos\\eDNE\\25092\\Delimitado\\DELTA_LOG_GRANDE_USUARIO.TXT', 
+               'c:\\projetos\\eDNE\\25101\\Delimitado\\DELTA_LOG_GRANDE_USUARIO.TXT', 
+               'c:\\projetos\\eDNE\\25102\\Delimitado\\DELTA_LOG_GRANDE_USUARIO.TXT', 
+               'c:\\projetos\\eDNE\\25111\\Delimitado\\DELTA_LOG_GRANDE_USUARIO.TXT', 
+               'c:\\projetos\\eDNE\\25112\\Delimitado\\DELTA_LOG_GRANDE_USUARIO.TXT', 
+               'c:\\projetos\\eDNE\\25121\\Delimitado\\DELTA_LOG_GRANDE_USUARIO.TXT', 
+               'c:\\projetos\\eDNE\\25122\\Delimitado\\DELTA_LOG_GRANDE_USUARIO.TXT', 
+               'c:\\projetos\\eDNE\\26011\\Delimitado\\DELTA_LOG_GRANDE_USUARIO.TXT', 
+               'c:\\projetos\\eDNE\\26012\\Delimitado\\DELTA_LOG_GRANDE_USUARIO.TXT', 
+               'c:\\projetos\\eDNE\\26021\\Delimitado\\DELTA_LOG_GRANDE_USUARIO.TXT', 
+               'c:\\projetos\\eDNE\\26022\\Delimitado\\DELTA_LOG_GRANDE_USUARIO.TXT', 
+               'c:\\projetos\\eDNE\\26031\\Delimitado\\DELTA_LOG_GRANDE_USUARIO.TXT']
+colunas_gud = ['gru_nu', 'ufe_sg', 'loc_nu', 'bai_nu', 'log_nu', 'gru_no', 'gru_endereco', 'cep', 'gru_no_abrev', 'gru_operacao', 'cep_ant']
+dtype_gud= {
+        'gru_nu': sqlalchemy.INTEGER(),
+        'ufe_sg': sqlalchemy.types.CHAR(2),
+        'loc_nu': sqlalchemy.INTEGER(),
+        'bai_nu': sqlalchemy.INTEGER(),
+        'log_nu': sqlalchemy.INTEGER(),
+        'gru_no': sqlalchemy.types.VARCHAR(72),
+        'gru_endereco': sqlalchemy.types.VARCHAR(100),
+        'cep': sqlalchemy.types.CHAR(8),
+        'gru_no_abrev': sqlalchemy.types.VARCHAR(36),
+        'gru_operacao': sqlalchemy.types.CHAR(3),
+        'cep_ant': sqlalchemy.types.CHAR(8),
+        'atualizacao': sqlalchemy.INTEGER()
+}
+versoes_gud= [25012, 25021, 25022, 25031, 25032, 25041, 25042, 25051, 25052, 25061, 25062, 25071, 25072, 25081, 25082, 25091, 25092, 25101, 25102, 25111, 25112, 25121, 25122, 26011, 26012, 26022, 26031]
+importar_dne(arquivos_gud, colunas_gud, 'dne_delta_grande_usuario', dtype_gud, versoes_gud)
