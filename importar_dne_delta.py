@@ -5,7 +5,7 @@ import unicodedata
 import re
 import sqlalchemy
 
-def salvar(df, table_name, if_exists='append', dtype=None):
+def salvar(df, table_name, if_exists='replace', dtype=None):
     sqlEngine = create_engine('mysql+pymysql://root:root@10.50.1.128:3306/ceps', pool_recycle=3600)
     dbConnection    = sqlEngine.connect()
     transaction = dbConnection.begin()
@@ -41,6 +41,7 @@ def importar_dne (arquivos, colunas, tabela, dtype, versoes):
         df_final= pd.concat(dfs,
                     ignore_index= True
                 )
+    df_final = df_final.drop_duplicates()
     salvar(df_final, tabela, dtype= dtype)
 
 
@@ -91,7 +92,7 @@ dtype_unidopd= {
         'cep_ant': sqlalchemy.types.CHAR(8)
 }
 versoes_unidopd= [25012, 25021, 25022, 25031, 25032, 25041, 25042, 25051, 25052, 25061, 25062, 25071, 25072, 25081, 25082, 25091, 25092, 25101, 25102, 25111, 25112, 25121, 25122, 26011, 26012, 26021, 26022, 26031]
-importar_dne(arquivos_unidopd, colunas_unidopd, 'dne_delta_unidop', dtype_unidopd, versoes_unidopd)
+importar_dne(arquivos_unidopd, colunas_unidopd, 'dne_delta_uop', dtype_unidopd, versoes_unidopd)
 
 #BAIRROS
 arquivos_bairrosd= [
@@ -134,7 +135,7 @@ dtype_bairrosd= {
         'bai_operacao': sqlalchemy.types.CHAR(3)
      }
 versoes_bairrosd= [25031, 25032, 25041, 25042, 25051, 25052, 25061, 25062, 25071, 25072, 25081, 25082, 25012, 25021, 25022, 25091, 25092, 25101, 25102, 25111, 25112, 25121, 25122, 26011, 26012, 26021, 26022, 26031]
-importar_dne(arquivos_bairrosd, colunas_bairrosd, 'dne_delta_bairros', dtype_bairrosd, versoes_bairrosd)
+importar_dne(arquivos_bairrosd, colunas_bairrosd, 'dne_delta_bairro', dtype_bairrosd, versoes_bairrosd)
 
 #CPC
 arquivos_cpcd= [

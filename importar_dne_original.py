@@ -6,7 +6,7 @@ import re
 import sqlalchemy
 
 #função importada de 'importar_dne.py'
-def salvar(df, table_name, if_exists='append', dtype=None):
+def salvar(df, table_name, if_exists='replace', dtype=None):
     sqlEngine = create_engine('mysql+pymysql://root:root@10.50.1.128:3306/ceps', pool_recycle=3600)
     dbConnection    = sqlEngine.connect()
     transaction = dbConnection.begin()
@@ -55,6 +55,7 @@ def importar_dne (arquivos, colunas, tabela, dtype, versoes):
                     #reorganiza os indices
                     ignore_index= True
                 )
+    df_final = df_final.drop_duplicates()
     #chama função salvar()
     salvar(df_final, tabela, dtype= dtype)
 

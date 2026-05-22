@@ -11,7 +11,7 @@ Ambos foram criados com o intuito de importar os arquivos, fornecidos em formato
 
 ### informações adicionais
 - os arquivos utilizados serão os da pasta 'Delimitado', os quais já possuem um separador pré definido ('@');
-- a função 'salvar' provém originalmente do arquivo 'importar_dne.py', mas passou por mudança no "if_exists= 'replace'" para "if_exists= 'apend'" ao ser colocada nos arquivos de importação;
+- a função 'salvar' provém originalmente do arquivo 'importar_dne.py';
 - as funções se encontram logo no início de ambos os scripts;
 - nas funções são utilizadas bibliotecas como: Pandas (pd) e sqlalchemy.
 
